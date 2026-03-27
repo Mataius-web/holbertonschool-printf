@@ -2,6 +2,35 @@
 #include <stdarg.h>
 #include <unistd.h>
 
+
+int print_number(int n)
+{
+	int count = 0;
+	char c;
+
+	if (n == -2147483648)
+	{
+		write(1, "-2147483648", 11);
+		return 11;
+	}
+
+	if (n < 0)
+	{
+		write(1, "-", 1);
+		count++;
+		n = -n;
+	}
+
+	if (n / 10)
+		count += print_number(n / 10);
+
+	c = (n % 10) + '0';
+	write(1, &c, 1);
+	count++;
+
+	return count;
+}
+
 /**
  * _printf - produces output according to a format
  * @format: format string
@@ -21,7 +50,7 @@ int _printf(const char *format, ...)
 
 	va_start(args, format);
 
-	while (format[i] != '\0')
+	while (format[i])
 	{
 		if (format[i] == '%')
 		{
@@ -54,6 +83,11 @@ int _printf(const char *format, ...)
 			{
 				write(1, "%", 1);
 				count++;
+			}
+			else if (format[i] == 'd' || format[i] == 'i')
+			{
+				int num = va_arg(args, int);
+				count += print_number(num);
 			}
 			else
 			{
